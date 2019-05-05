@@ -7,41 +7,58 @@ Soal ini meminta kita untuk membuat program untuk menghitung bilangan faktorial 
 
 ```
 void *factorial(void *n){
-	int index = *((int *)n);
-	int x, factorial=1;
-	for(x=1;x<=index;x++){
-		factorial= factorial*x;
-	}
-	printf("%d!=%d\n",index, factorial);
+    int index = *((int *)n);
+    int x, factorial=1;
+    int self_id;
+    self_id=pthread_self();
+    printf("Thread %u \n",self_id);
+    
+    for(x=1;x<=index;x++){
+        factorial= factorial*x;
+    }
+    urutan[b] = index;
+    fak[b] = factorial;
+    b++;
 }
 
-int main(){
-	pthread_t threads[300];
-	int num[300];
-	char a;
-	int result[300];
+int main(int argc, char *argv[]){
+    pthread_t threads[300];
+    char a;
+    int result[300];
+    int num[300];
 
-	for(i=0;a!='\n';i++){
-		scanf("%d%c", &num[i], &a);
-		count++;
-	}
+    for(i=0;a!='\n';i++){
+        scanf("%d%c", &num[i], &a);
+        count++;
+    }
 
-	for(i=0;i<count;i++){
-		for(j=i+1;j<count;j++){
-			if(num[i]>num[j]){
-				p=num[i];
-				num[i]=num[j];
-				num[j]=p;
-			}		
-		}
-	}
+    
+    for(i=0;i<count;i++){
+        result[i]=pthread_create(&(threads[i]), NULL, factorial, &num[i]);
+    }
+    
+    for(i=0;i<count;i++){
+        result[i]=pthread_join(threads[i],NULL);
+    }
 
-	for(i=0;i<count;i++){
-		result[i]=pthread_create(&(threads[i]), NULL, factorial, &num[i]);
-		result[i]=pthread_join(threads[i],NULL);
-	}
-	
-	return 0;
+    for(i=0;i<count;i++){
+        for(j=i+1;j<count;j++){
+            if(fak[i]>fak[j]){
+                p=fak[i];
+                fak[i]=fak[j];
+                fak[j]=p;
+                
+                p = urutan[i];
+                urutan[i] = urutan[j];
+                urutan[j] = p;
+            }       
+        }
+    }
+    for(i=0;i<count;i++){
+        printf("%d!=%d\n",urutan[i], fak[i]);
+    }
+    
+    return 0;
 }
 ```
 
@@ -383,27 +400,40 @@ void* battle(void *arg)
             pthread_t id=pthread_self();
             if(pthread_equal(id,tid[4]))//thread untuk menjalankan counter
             {
-                
-                input = getch();
-                if (input == 49)
-                {
-                    if(m_attack == 1 && enemy_health!=0){
-                        enemy_health = enemy_health - 20;
-                        m_attack = 0;
+                if (enemy_health != 0 && health != 0){
+                    input = getch();
+                    if (input == 49)
+                    {
+                        if(m_attack == 1)
+                        {
+                            enemy_health = enemy_health - 20;
+                            m_attack = 0;
+                        }
+                        else if(m_attack == 0 )
+                        {
+                            health = health - 20;
+                            m_attack = 1;
+                        }
+                        status = 3;
                     }
-                    else if(m_attack == 0){
-                        health = health - 20;
-                        m_attack = 1;
-                    }
-                    status = 3;
-                    if(health ==0){
-                        status = -1;
+                    else if(input == 50)
+                    {
+                        enemy_health =100;
+                        status = 0;
                     }
                 }
-                else if(input == 50)
+                else if (health == 0)
+                {
+                    status = -1;
+                }
+                if (enemy_health == 0)
                 {
                     status = 0;
+                    system("clear");
+                    printf("Musuh kalah\n");
+                    enemy_health = 100;
                 }
+                    
             }
         }
     }

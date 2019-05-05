@@ -95,8 +95,19 @@ void* standby(void *arg)
                 input = getch();
                 // printf("%d\n",input );
                 if(input == 49){
-                    hunger = hunger + 15;
-                    my_stok -- ;
+                    if (my_stok > 0)
+                    {
+                        hunger = hunger + 15;
+                        if (hunger > 200)
+                        {
+                            hunger = 200;
+                            my_stok -- ;
+                        }
+                        else
+                        {
+                            my_stok -- ;    
+                        }
+                    }
                 }
                 else if(input == 50){
                     if (cooldown == 0)
@@ -133,27 +144,40 @@ void* battle(void *arg)
             pthread_t id=pthread_self();
             if(pthread_equal(id,tid[4]))//thread untuk menjalankan counter
             {
-                
-                input = getch();
-                if (input == 49)
-                {
-                    if(m_attack == 1 && enemy_health!=0){
-                        enemy_health = enemy_health - 20;
-                        m_attack = 0;
+                if (enemy_health != 0 && health != 0){
+                    input = getch();
+                    if (input == 49)
+                    {
+                        if(m_attack == 1)
+                        {
+                            enemy_health = enemy_health - 20;
+                            m_attack = 0;
+                        }
+                        else if(m_attack == 0 )
+                        {
+                            health = health - 20;
+                            m_attack = 1;
+                        }
+                        status = 3;
                     }
-                    else if(m_attack == 0){
-                        health = health - 20;
-                        m_attack = 1;
-                    }
-                    status = 3;
-                    if(health ==0){
-                        status = -1;
+                    else if(input == 50)
+                    {
+                        enemy_health =100;
+                        status = 0;
                     }
                 }
-                else if(input == 50)
+                else if (health == 0)
+                {
+                    status = -1;
+                }
+                if (enemy_health == 0)
                 {
                     status = 0;
+                    system("clear");
+                    printf("Musuh kalah\n");
+                    enemy_health = 100;
                 }
+                    
             }
         }
     }

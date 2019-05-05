@@ -45,13 +45,8 @@ void* shop_jual(void *arg)
                 input = getch();
                 if (input == 49)
                 {
-                    if(*stok>0){
-                        (*stok) ++;
-                        status = 0;
-                    }
-                    else{
-                        printf("Stok Habis\n");
-                    }
+                    (*stok) ++;
+                    status = 0;
                 }
                 else if(input == 50)
                 {
@@ -64,18 +59,18 @@ void* shop_jual(void *arg)
 
 int main(int argc, char const *argv[])
 {
-	key_t key = 1234;
+  key_t key = 1234;
     int shmid = shmget(key, sizeof(int), IPC_CREAT | 0666);
-   	stok = shmat(shmid, NULL, 0);
+    stok = shmat(shmid, NULL, 0);
     pthread_create(&(tid[0]),NULL,shop_jual,NULL);//membuat thread
-    while(*stok>0&&status!=-1){
-    	system("clear");
-    	if (status == 0)
-    	{
-    		printf("Shop\nFood stock : %d\nChoices\n1.Restock\n2.Exit\n", *stok);
-    	}
-    	sleep(1);
+    while(status!=-1){
+      system("clear");
+      if (status == 0)
+      {
+        printf("Shop\nFood stock : %d\nChoices\n1.Restock\n2.Exit\n", *stok);
+      }
+      sleep(1);
     }
 
-	return 0;
+  return 0;
 }
